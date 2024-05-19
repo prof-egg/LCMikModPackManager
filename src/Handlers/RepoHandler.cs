@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using MikManager.Util;
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace MikManager.Handlers
 {
@@ -12,8 +13,8 @@ namespace MikManager.Handlers
         private const string RepoName = "LCMikModPackManager";
         private const string GitHubApiUrl = "https://api.github.com";
         private const string GitHubRateLimitApiUrl = "https://api.github.com/rate_limit";
-        private const string ModConfigPath = "mod-pack-data"; // Specify the folder path
-        private static readonly string PREPENDED_DOWNLOAD_PATH = "downloads/";
+        public const string ModConfigPath = "mod-pack-data"; // Specify the folder path
+        private static readonly string PREPENEDED_DOWNLOAD_PATH = KnownFolders.Downloads.Path + "/";
 
         private static int rateLimit = -1;
         private static int requestsRemaining = -1;
@@ -163,9 +164,9 @@ namespace MikManager.Handlers
             return $"https://raw.githubusercontent.com/{RepoOwner}/{RepoName}/main/{relativePath}";
         }
 
-        private static string GetDownloadPath(string file) 
+        public static string GetDownloadPath(string file) 
         {
-            return PREPENDED_DOWNLOAD_PATH + file;
+            return PREPENEDED_DOWNLOAD_PATH + file;
         }
     }
 }
