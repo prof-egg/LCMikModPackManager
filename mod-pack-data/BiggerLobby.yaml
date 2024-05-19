@@ -1,6 +1,5 @@
 LethalCompanyVersion: "50"
 Mods:
-  - BiggerLobby:
-      name: BiggerLobby
-      developer: bizzlemip
-      version: "2.7.0"
+  - Name: BiggerLobby
+    Developer: bizzlemip
+    Version: "2.7.0"
