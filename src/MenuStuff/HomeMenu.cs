@@ -9,7 +9,7 @@ namespace MikManager.MenuStuff
         public override void PrintMenu()
         {
             Console.WriteLine("HOME MENU:");
-            Console.WriteLine("(1) Hi!");
+            Console.WriteLine("(1) View modpack configs");
             Console.WriteLine("(2) View request data");
             Console.Write("\nWhat would you like to do? ");
         }
@@ -19,9 +19,7 @@ namespace MikManager.MenuStuff
             switch (selection)
             {
                 case 1:
-                    Console.WriteLine("Hi!");
-                    Console.WriteLine(); // For spacing in the console
-                    return this;
+                    return new ModPackListMenu();
                 case 2:
                     return new RequestsMenu();
                 default:
