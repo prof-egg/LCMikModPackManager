@@ -19,6 +19,8 @@ namespace MikManager.Handlers
         private static string limitResetDate = "null";
         private static string limitResetTime = "null";
 
+        private static JArray? jsonConfigList = null;
+
         public static void UpdateRateLimitDetails()
         {
             Debug.LogInfo("Updating request details...", loggerID);
@@ -69,7 +71,7 @@ namespace MikManager.Handlers
             }
         }
 
-        public static void Test()
+        public static void UpdateModPackConfigList()
         {
             Debug.LogInfo("Requesting mod pack configs...", loggerID);
 
@@ -85,12 +87,7 @@ namespace MikManager.Handlers
                 string responseBody = response.Content.ReadAsStringAsync().Result;
                 JArray jsonArray = JArray.Parse(responseBody);
 
-                foreach (JObject jsonObject in jsonArray.Cast<JObject>())
-                {
-                    string? fileName = jsonObject.Value<string>("name");
-                    string? filePath = jsonObject.Value<string>("path");
-                    // Console.WriteLine($"File: {fileName} Path: {filePath}");
-                }
+                jsonConfigList = jsonArray;
             }
             catch (HttpRequestException e)
             {
@@ -120,6 +117,11 @@ namespace MikManager.Handlers
         public static string GetLimitResetTime()
         {
             return limitResetTime;
+        }
+
+        public static JArray? GetModConfigList() 
+        {
+            return jsonConfigList;
         }
     }
 }
