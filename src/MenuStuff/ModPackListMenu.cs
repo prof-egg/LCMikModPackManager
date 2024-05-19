@@ -1,6 +1,7 @@
-using System;
 using MikManager.Handlers;
 using Newtonsoft.Json.Linq;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace MikManager.MenuStuff
 {
@@ -15,10 +16,7 @@ namespace MikManager.MenuStuff
             JArray? configList = RepoHandler.GetModConfigList();
 
             if (configList == null) 
-            {
                 Console.WriteLine("Error: modpack config list was null");
-                
-            } 
             else 
             {
                 JToken[] configArray = configList.ToArray();
@@ -35,8 +33,42 @@ namespace MikManager.MenuStuff
 
         protected override BaseMenu? HandleInput(int selection)
         {
+            // Go back a page
             if (selection == this.GetUpperChoiceBound())
                 return null;
+            
+            // INSTALL MOD PACK SPECIFIED FROM YAML
+            // Get modpack file name
+            JArray? configList = RepoHandler.GetModConfigList();
+            if (configList == null) 
+            {
+                Console.WriteLine("Error: modpack config list was null");
+                return this;
+            }
+            JToken[] configArray = configList.ToArray();
+            string? configFileName = configArray[selection - 1].Value<string>("name");
+            if (configFileName == null)
+            {
+                Console.WriteLine("Error: couldn't get config file name from user input");
+                return this;
+            }
+            Console.WriteLine(); // For console spacing
+
+            // Download config
+            RepoHandler.DownloadFileFromRepo($"{RepoHandler.ModConfigPath}/{configFileName}");
+
+            // Parse config
+            string configPath = RepoHandler.GetDownloadPath(configFileName);
+            Config configObj = YamlHandler.ParseModConfigFile(configPath);
+
+            Console.WriteLine($"LethalCompanyVersion: {configObj.lethalCompanyVersion}");
+            foreach (var mod in configObj.mods)
+            {
+                Console.WriteLine($"Mod Name: {mod.id}");
+                Console.WriteLine($"Developer: {mod.developer}");
+                Console.WriteLine($"Version: {mod.version}");
+            }
+            
             return this;
         }
 
