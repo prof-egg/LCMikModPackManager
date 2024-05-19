@@ -54,10 +54,7 @@ namespace MikManager.MenuStuff
                 if (select == -1)
                     return -1;
                 else if (select < this.GetLowerChoiceBound() || select > this.GetUpperChoiceBound())
-                {
                     Console.WriteLine(this.GenerateInputErrorMsg());
-                    input.NextLine(); // Swallow current input line to clear input buffer
-                }
                 else
                     return select;
             }
