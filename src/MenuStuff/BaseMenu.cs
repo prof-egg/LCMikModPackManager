@@ -31,7 +31,7 @@ namespace MikManager.MenuStuff
         {
             Console.WriteLine("             _                                                      ");
             Console.WriteLine("           _| |                                                     ");
-            Console.WriteLine(" _ __ ___ ( )_| __  _ __ ___   __ _ _ __   __ _  __ _  ___ _ __     ");
+            Console.WriteLine(" _ __ ___ ( ) | __  _ __ ___   __ _ _ __   __ _  __ _  ___ _ __     ");
             Console.WriteLine("| '_ ` _ \\| | |/ / | '_ ` _ \\ / _` | '_ \\ / _` |/ _` |/ _ \\ '__|");
             Console.WriteLine("| | | | | | |   <  | | | | | | (_| | | | | (_| | (_| |  __/ |       ");
             Console.WriteLine("|_| |_| |_|_|_|\\_\\ |_| |_| |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_| ");
