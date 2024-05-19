@@ -1,5 +1,4 @@
-﻿using System;
-using MikManager.Util;
+﻿using MikManager.Util;
 using MikManager.MenuStuff;
 using MikManager.Handlers;
 
@@ -9,17 +8,26 @@ namespace MikManager
     {
         public static void Main(string[] args)
         {
-            ThunderstoreHandler.DownloadMod("bizzlemip", "BiggerLobby", "2.7.0");
-            
-            // Scanner scanner = new Scanner(Console.In);
-            // BaseMenu.InjectScanner(scanner);
-            // BaseMenu.PrintLabel();
+            // RepoHandler.DownloadFileFromRepo("mod-pack-data/BiggerLobby.yaml");
 
-            // RepoHandler.Test();
-            // RepoHandler.UpdateRateLimitDetails();
-            // Console.WriteLine();
+            // HashSet<string> paths = ThunderstoreHandler.DownloadModWithDependencies("bizzlemip", "BiggerLobby", "2.7.0");
+            // ThunderstoreHandler.InstallMods(paths);
+            // ThunderstoreHandler.DeleteInstalledMods();
 
-            // MenuHandler.Initialize(new HomeMenu());
+            // ThunderstoreHandler.DownloadMod("BepInEx", "BepInExPack", "5.4.2100", true, true);
+
+            // foreach (string path in paths)
+            //     Console.WriteLine(path);
+
+            Scanner scanner = new Scanner(Console.In);
+            BaseMenu.InjectScanner(scanner);
+            BaseMenu.PrintLabel();
+
+            RepoHandler.UpdateModPackConfigList();
+            RepoHandler.UpdateRateLimitDetails();
+            Console.WriteLine();
+
+            MenuHandler.Initialize(new HomeMenu());
         }
     }
 }
