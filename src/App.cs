@@ -1,6 +1,7 @@
 ﻿using System;
 using MikManager.Util;
 using MikManager.MenuStuff;
+using MikManager.Handlers;
 
 namespace MikManager
 {
@@ -8,19 +9,17 @@ namespace MikManager
     {
         public static void Main(string[] args)
         {
-            Scanner scanner = new Scanner(Console.In);
-            BaseMenu.InjectScanner(scanner);
-            BaseMenu.PrintLabel();
+            ThunderstoreHandler.DownloadMod("bizzlemip", "BiggerLobby", "2.7.0");
+            
+            // Scanner scanner = new Scanner(Console.In);
+            // BaseMenu.InjectScanner(scanner);
+            // BaseMenu.PrintLabel();
 
-            RepoHandler.Test();
-            RepoHandler.UpdateRateLimitDetails();
-            // Console.WriteLine("Doing stuff...");
-            Console.WriteLine();
-
-            MenuHandler.Initialize(new HomeMenu());
-
-            // GitHubRepoFiles.Test();
+            // RepoHandler.Test();
             // RepoHandler.UpdateRateLimitDetails();
+            // Console.WriteLine();
+
+            // MenuHandler.Initialize(new HomeMenu());
         }
     }
 }

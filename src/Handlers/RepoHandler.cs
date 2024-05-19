@@ -1,16 +1,12 @@
 using Newtonsoft.Json.Linq;
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Text;
 using MikManager.Util;
 
-namespace MikManager
+namespace MikManager.Handlers
 {
     public static class RepoHandler
     {
         private const string loggerID = "RepoHandler";
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly HttpClient httpClient = new HttpClient();
 
         private const string RepoOwner = "prof-egg";
         private const string RepoName = "LCMikModPackManager";
@@ -32,7 +28,7 @@ namespace MikManager
 
             try
             {
-                HttpResponseMessage response = HttpClient.Send(request);
+                HttpResponseMessage response = httpClient.Send(request);
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = response.Content.ReadAsStringAsync().Result;
@@ -83,7 +79,7 @@ namespace MikManager
 
             try
             {
-                HttpResponseMessage response = HttpClient.Send(request);
+                HttpResponseMessage response = httpClient.Send(request);
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = response.Content.ReadAsStringAsync().Result;
