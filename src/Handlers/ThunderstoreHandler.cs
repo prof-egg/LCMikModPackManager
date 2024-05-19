@@ -114,8 +114,15 @@ namespace MikManager.Handlers
             }
         }
 
-        public static void InstallMods(IEnumerable<string> extractedModPaths)
+        public static bool InstallMods(IEnumerable<string> extractedModPaths)
         {
+
+            if (!Directory.Exists(DEFAULT_LC_PATH))
+            {
+                Debug.LogError($"Unable to find lethal company folder. Path checked: {DEFAULT_LC_PATH}", loggerID);
+                return false;
+            }
+
             foreach (string modPath in extractedModPaths)
             {
                 string sourcePath = modPath;
@@ -142,6 +149,7 @@ namespace MikManager.Handlers
                 // Debug.LogInfo("Deleting leftover files...", loggerID);
                 Directory.Delete(modPath, true);
             }
+            return true;
         }
 
         public static void DeleteInstalledMods()
