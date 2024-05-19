@@ -1,4 +1,6 @@
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
+using Microsoft.WindowsAPICodePack.Shell;
 using MikManager.Util;
 using Newtonsoft.Json.Linq;
 
@@ -10,7 +12,10 @@ namespace MikManager.Handlers
         private static readonly HttpClient httpClient = new HttpClient();
 
         // This string gets prepended to the path returned by GetDownloadPath()
-        private static readonly string prependedDownloadPath = "downloads/";
+        private static readonly string PREPENEDED_DOWNLOAD_PATH = KnownFolders.Downloads.Path + "/";
+        // private static readonly string USER_HOME = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        private static readonly string DEFAULT_LC_PATH = Path.Combine("C:", "Program Files (x86)", "Steam", "steamapps", "common", "Lethal Company");
+        //C:\Program Files (x86)\Steam\steamapps\common\Lethal Company
 
         public static HashSet<string> DownloadModWithDependencies(string modDeveloper, string modId, string modVersion)
         {   
@@ -109,9 +114,99 @@ namespace MikManager.Handlers
             }
         }
 
+        public static void InstallMods(IEnumerable<string> extractedModPaths)
+        {
+            foreach (string modPath in extractedModPaths)
+            {
+                string sourcePath = modPath;
+                string modName = modPath.Substring(modPath.LastIndexOf('/') + 1);
+                Debug.LogInfo($"Installing {modName}...", loggerID);
+
+                // Attempt to resolve BepInEx not being the first
+                // directory in the mod path
+                while (!Directory.Exists($"{sourcePath}/BepInEx"))
+                {
+                    string[] subPaths = Directory.GetDirectories(sourcePath);
+                    if (subPaths.Length == 0)
+                    {
+                        Debug.LogError($"Failed to install {modName}", loggerID);
+                        break;
+                    }
+                    sourcePath = subPaths[0];
+                }
+
+                // Move content
+                MoveDirectoryContents(sourcePath, DEFAULT_LC_PATH);
+
+                // Delete whats left of original download
+                // Debug.LogInfo("Deleting leftover files...", loggerID);
+                Directory.Delete(modPath, true);
+            }
+        }
+
+        public static void DeleteInstalledMods()
+        {
+            Debug.LogInfo("Deleting installed mods...", loggerID);
+
+            string doorStopPath = DEFAULT_LC_PATH + "/doorstop_config.ini";
+            string winhttpPath = DEFAULT_LC_PATH + "/winhttp.dll";
+            string bepInExPath = DEFAULT_LC_PATH + "/BepInEx";
+
+            // Handle special cases
+            if (File.Exists(doorStopPath))
+                File.Delete(doorStopPath);
+            if (File.Exists(winhttpPath))
+                File.Delete(winhttpPath);
+
+            // Delete BepInEx mod folder
+            if (Directory.Exists(bepInExPath))
+                Directory.Delete(bepInExPath, true);
+        }
+
         /***************************************************************************
         * Helper Methods
         ***************************************************************************/
+        private static void MoveDirectoryContents(string sourceDir, string destinationDir)
+        {
+            // Ensure the destination directory exists
+            Directory.CreateDirectory(destinationDir);
+
+            // Move files
+            foreach (string file in Directory.GetFiles(sourceDir))
+            {
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(destinationDir, fileName);
+
+                // This is specifically for skipping unnecessary content that
+                // comes with the downloaded mod
+                bool skip = fileName == "manifest.json" || fileName == "CHANGELOG.md" || fileName == "README.md" || fileName == "icon.png";
+                if (skip) continue;
+                
+                try 
+                {
+                    if (!File.Exists(destFile))
+                        File.Move(file, destFile);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error moving files and directories: {ex.Message}", loggerID);
+                }
+            }
+
+            // Move directories
+            foreach (string directory in Directory.GetDirectories(sourceDir))
+            {
+                string dirName = Path.GetFileName(directory);
+                string destDir = Path.Combine(destinationDir, dirName);
+
+                // Recursively move the contents of the directory
+                MoveDirectoryContents(directory, destDir);
+
+                // Delete the source directory after its contents have been moved
+                // Directory.Delete(directory, true);
+            }
+        }
+
         private static void DownloadFile(string url, string outputPath)
         {
             using HttpResponseMessage response = httpClient.GetAsync(url).Result;
@@ -120,19 +215,19 @@ namespace MikManager.Handlers
             File.WriteAllBytes(outputPath, fileBytes);
         }
 
-        private static string GetDownloadUrl(string modDeveloper, string modId, string modVersion)
+        public static string GetDownloadUrl(string modDeveloper, string modId, string modVersion)
         {
             return $"https://thunderstore.io/package/download/{modDeveloper}/{modId}/{modVersion}";
         }
 
-        private static string GetZipDownloadPath(string modId, string modVersion) 
+        public static string GetZipDownloadPath(string modId, string modVersion) 
         {
             return GetDownloadPath(modId, modVersion) + ".zip";
         }
 
-        private static string GetDownloadPath(string modId, string modVersion) 
+        public static string GetDownloadPath(string modId, string modVersion) 
         {
-            return prependedDownloadPath + $"{modId}-{modVersion}";
+            return PREPENEDED_DOWNLOAD_PATH + $"{modId}-{modVersion}";
         }
     }
 }
