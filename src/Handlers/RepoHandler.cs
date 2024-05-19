@@ -12,7 +12,8 @@ namespace MikManager.Handlers
         private const string RepoName = "LCMikModPackManager";
         private const string GitHubApiUrl = "https://api.github.com";
         private const string GitHubRateLimitApiUrl = "https://api.github.com/rate_limit";
-        private const string FolderPath = "mod-pack-data"; // Specify the folder path
+        private const string ModConfigPath = "mod-pack-data"; // Specify the folder path
+        private static readonly string PREPENDED_DOWNLOAD_PATH = "downloads/";
 
         private static int rateLimit = -1;
         private static int requestsRemaining = -1;
@@ -75,7 +76,7 @@ namespace MikManager.Handlers
         {
             Debug.LogInfo("Requesting mod pack configs...", loggerID);
 
-            string url = $"{GitHubApiUrl}/repos/{RepoOwner}/{RepoName}/contents/{FolderPath}";
+            string url = GetGitHubRepoAPIPath(ModConfigPath);
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("User-Agent", "HttpClient");
 
@@ -97,6 +98,22 @@ namespace MikManager.Handlers
             {
                 Console.WriteLine($"Exception: {e.Message}");
             }
+        }
+
+        public static void DownloadFileFromRepo(string repoFilePath)
+        {
+            string url = GetGitHubRepoDownloadPath(repoFilePath);
+            string fileName = repoFilePath.Substring(repoFilePath.LastIndexOf('/') + 1);
+            string downloadPath = GetDownloadPath(fileName);
+
+            if (File.Exists(downloadPath))
+            {
+                Debug.LogInfo($"Deleting old {fileName}...", loggerID);
+                File.Delete(downloadPath);
+            }
+
+            Debug.LogInfo($"Downloading {fileName}...", loggerID);
+            DownloadFile(url, GetDownloadPath(fileName));
         }
 
         public static int GetRateLimit()
@@ -122,6 +139,33 @@ namespace MikManager.Handlers
         public static JArray? GetModConfigList() 
         {
             return jsonConfigList;
+        }
+
+        /***************************************************************************
+        * Helper Methods
+        ***************************************************************************/
+        private static void DownloadFile(string url, string outputPath)
+        {
+            using HttpResponseMessage response = httpClient.GetAsync(url).Result;
+            response.EnsureSuccessStatusCode();
+            byte[] fileBytes = response.Content.ReadAsByteArrayAsync().Result;
+            File.WriteAllBytes(outputPath, fileBytes);
+        }
+
+        private static string GetGitHubRepoAPIPath(string relativePath)
+        {
+            return $"{GitHubApiUrl}/repos/{RepoOwner}/{RepoName}/contents/{relativePath}";
+        }
+        
+        private static string GetGitHubRepoDownloadPath(string relativePath)
+        {
+            //https://raw.githubusercontent.com/{owner}/{repo}/main/{filePath}
+            return $"https://raw.githubusercontent.com/{RepoOwner}/{RepoName}/main/{relativePath}";
+        }
+
+        private static string GetDownloadPath(string file) 
+        {
+            return PREPENDED_DOWNLOAD_PATH + file;
         }
     }
 }
