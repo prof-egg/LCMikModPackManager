@@ -1,7 +1,5 @@
 using MikManager.Handlers;
 using Newtonsoft.Json.Linq;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace MikManager.MenuStuff
 {
@@ -37,6 +35,9 @@ namespace MikManager.MenuStuff
             if (selection == this.GetUpperChoiceBound())
                 return null;
             
+            // Delete old mods
+            ThunderstoreHandler.DeleteInstalledMods();
+
             // INSTALL MOD PACK SPECIFIED FROM YAML
             // Get modpack file name
             JArray? configList = RepoHandler.GetModConfigList();
@@ -61,14 +62,11 @@ namespace MikManager.MenuStuff
             string configPath = RepoHandler.GetDownloadPath(configFileName);
             Config configObj = YamlHandler.ParseModConfigFile(configPath);
 
-            Console.WriteLine($"LethalCompanyVersion: {configObj.lethalCompanyVersion}");
-            foreach (var mod in configObj.mods)
-            {
-                Console.WriteLine($"Mod Name: {mod.id}");
-                Console.WriteLine($"Developer: {mod.developer}");
-                Console.WriteLine($"Version: {mod.version}");
-            }
-            
+            // Download and install mods
+            HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModsWithDependencies(configObj.Mods);
+            ThunderstoreHandler.InstallMods(modDownloadPaths);
+            Console.WriteLine(); // For spacing
+
             return this;
         }
 
