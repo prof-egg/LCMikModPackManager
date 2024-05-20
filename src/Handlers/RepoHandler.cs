@@ -1,6 +1,5 @@
 using Newtonsoft.Json.Linq;
 using MikManager.Util;
-using Microsoft.WindowsAPICodePack.Shell;
 
 namespace MikManager.Handlers
 {
@@ -14,7 +13,9 @@ namespace MikManager.Handlers
         private const string GitHubApiUrl = "https://api.github.com";
         private const string GitHubRateLimitApiUrl = "https://api.github.com/rate_limit";
         public const string ModConfigPath = "mod-pack-data"; // Specify the folder path
-        private static readonly string PREPENEDED_DOWNLOAD_PATH = KnownFolders.Downloads.Path + "/";
+        // This string gets prepended to the path returned by GetDownloadPath()
+        private static readonly string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        private static readonly string PREPENEDED_DOWNLOAD_PATH = Path.Combine(userProfile, "Downloads") + "/";
 
         private static int rateLimit = -1;
         private static int requestsRemaining = -1;
