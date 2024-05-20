@@ -74,6 +74,8 @@ namespace MikManager.MenuStuff
             // Download and install mods
             HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModsWithDependencies(configObj.Mods);
             ModHandler.InstallMods(modDownloadPaths);
+
+            RepoHandler.UpdateRateLimitDetails();
             Console.WriteLine(); // For spacing
 
             return this;
