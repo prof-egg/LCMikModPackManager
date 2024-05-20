@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using System.Runtime.CompilerServices;
 using Microsoft.WindowsAPICodePack.Shell;
 using MikManager.Util;
 using Newtonsoft.Json.Linq;
@@ -16,6 +15,19 @@ namespace MikManager.Handlers
         // private static readonly string USER_HOME = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         private static readonly string DEFAULT_LC_PATH = Path.Combine("C:", "Program Files (x86)", "Steam", "steamapps", "common", "Lethal Company");
         //C:\Program Files (x86)\Steam\steamapps\common\Lethal Company
+
+        public static HashSet<string> DownloadModsWithDependencies(Mod[] mods)
+        {
+            HashSet<string> modDownloadPaths = [];
+            foreach (Mod mod in mods)
+                modDownloadPaths.UnionWith(DownloadModWithDependencies(mod));
+            return modDownloadPaths;
+        }
+
+        public static HashSet<string> DownloadModWithDependencies(Mod mod)
+        {   
+            return  DownloadModWithDependencies(mod.Developer, mod.Name, mod.Version);
+        }
 
         public static HashSet<string> DownloadModWithDependencies(string modDeveloper, string modId, string modVersion)
         {   
