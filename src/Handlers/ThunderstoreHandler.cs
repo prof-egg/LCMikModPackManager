@@ -13,17 +13,17 @@ namespace MikManager.Handlers
         private static readonly string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         private static readonly string PREPENEDED_DOWNLOAD_PATH = Path.Combine(userProfile, "Downloads") + "/";
 
-        public static HashSet<string> DownloadModsWithDependencies(Mod[] mods)
+        public static HashSet<string> DownloadModsWithDependencies(Config config)
         {
             HashSet<string> modDownloadPaths = [];
-            foreach (Mod mod in mods)
-                modDownloadPaths.UnionWith(DownloadModWithDependencies(mod));
+            foreach (string dependencyString in config.Mods)
+                modDownloadPaths.UnionWith(DownloadModWithDependencies(Config.ParseDependencyString(dependencyString)));
             return modDownloadPaths;
         }
 
         public static HashSet<string> DownloadModWithDependencies(Mod mod)
         {   
-            return  DownloadModWithDependencies(mod.Developer, mod.Name, mod.Version);
+            return  DownloadModWithDependencies(mod.Developer, mod.Id, mod.Version);
         }
 
         public static HashSet<string> DownloadModWithDependencies(string modDeveloper, string modId, string modVersion)

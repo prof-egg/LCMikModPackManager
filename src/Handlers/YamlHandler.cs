@@ -18,15 +18,27 @@ namespace MikManager.Handlers
         }
     }
 
-    public class Config {
+    public class Config 
+    {
         public required string LethalCompanyVersion { get; set; }
-        public required Mod[] Mods { get; set; }
+        public required List<string> Mods { get; set; }
+        public static Mod ParseDependencyString(string depependencyString) 
+        {
+            return new Mod(depependencyString);
+        }
     }
 
     public class Mod
     {
-        public required string Developer { get; set; }
-        public required string Name { get; set; }
-        public required string Version { get; set; }
+        public readonly string Developer;
+        public readonly string Id;
+        public readonly string Version;
+        public Mod(string depependencyString)
+        {
+            string[] data = depependencyString.Split('-');
+            this.Developer = data[0];
+            this.Id = data[1];
+            this.Version = data[2];
+        }
     }
 }

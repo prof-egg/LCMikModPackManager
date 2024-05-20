@@ -72,7 +72,7 @@ namespace MikManager.MenuStuff
             Config configObj = YamlHandler.ParseModConfigFile(configPath);
 
             // Download and install mods
-            HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModsWithDependencies(configObj.Mods);
+            HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModsWithDependencies(configObj);
             ModHandler.InstallMods(modDownloadPaths);
 
             RepoHandler.UpdateRateLimitDetails();
