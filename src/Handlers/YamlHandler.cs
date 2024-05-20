@@ -1,6 +1,5 @@
 using MikManager.Util;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace MikManager.Handlers
 {
@@ -8,10 +7,8 @@ namespace MikManager.Handlers
     {
         private static readonly string loggerID = "YamlHandler";
 
-        private static readonly IDeserializer deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build();
-
+        private static readonly Deserializer deserializer = new Deserializer();
+ 
         public static Config ParseModConfigFile(string modConfigPath)
         {
             Debug.LogInfo("Parsing config file...", loggerID);
@@ -21,16 +18,15 @@ namespace MikManager.Handlers
         }
     }
 
-    public class Config(string lethalCompanyVersion, Mod[] mods)
-    {
-        public readonly string lethalCompanyVersion = lethalCompanyVersion;
-        public readonly Mod[] mods = mods;
+    public class Config {
+        public required string LethalCompanyVersion { get; set; }
+        public required Mod[] Mods { get; set; }
     }
 
-    public class Mod(string developer, string id, string version)
+    public class Mod
     {
-        public readonly string developer = developer;
-        public readonly string id = id;
-        public readonly string version = version;
+        public required string Developer { get; set; }
+        public required string Name { get; set; }
+        public required string Version { get; set; }
     }
 }
