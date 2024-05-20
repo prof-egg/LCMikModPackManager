@@ -53,7 +53,6 @@ namespace MikManager.MenuStuff
                 Console.WriteLine("Error: couldn't get config file name from user input");
                 return this;
             }
-            Console.WriteLine(); // For console spacing
 
             // Download config
             RepoHandler.DownloadFileFromRepo($"{RepoHandler.ModConfigPath}/{configFileName}");
