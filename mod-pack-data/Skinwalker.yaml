@@ -1,0 +1,8 @@
+LethalCompanyVersion: "50"
+Mods:
+  - Name: BiggerLobby
+    Developer: bizzlemip
+    Version: "2.7.0"
+  - Name: Skinwalkers
+    Developer: RugbugRedfern
+    Version: "5.0.0"
