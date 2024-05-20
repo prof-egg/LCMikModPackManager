@@ -8,17 +8,6 @@ namespace MikManager
     {
         public static void Main(string[] args)
         {
-            // RepoHandler.DownloadFileFromRepo("mod-pack-data/BiggerLobby.yaml");
-
-            // HashSet<string> paths = ThunderstoreHandler.DownloadModWithDependencies("bizzlemip", "BiggerLobby", "2.7.0");
-            // ThunderstoreHandler.InstallMods(paths);
-            // ThunderstoreHandler.DeleteInstalledMods();
-
-            // ThunderstoreHandler.DownloadMod("BepInEx", "BepInExPack", "5.4.2100", true, true);
-
-            // foreach (string path in paths)
-            //     Console.WriteLine(path);
-
             Scanner scanner = new Scanner(Console.In);
             BaseMenu.InjectScanner(scanner);
             BaseMenu.PrintLabel();
