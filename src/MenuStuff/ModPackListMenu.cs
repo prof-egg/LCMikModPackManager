@@ -24,6 +24,8 @@ namespace MikManager.MenuStuff
                     string? name = jsonObject.Value<string>("name");
                     Console.WriteLine($"({i + 1}) {name}");
                 }
+                Console.WriteLine(); // For spacing between options
+                Console.WriteLine($"({this.GetUpperChoiceBound() - 1}) Delete installed mods");
                 Console.WriteLine($"({this.GetUpperChoiceBound()}) Go back");
             }
             Console.Write("\nWhat pack would you like to install? ");
@@ -31,12 +33,20 @@ namespace MikManager.MenuStuff
 
         protected override BaseMenu? HandleInput(int selection)
         {
+            // Delete installed mods
+            if (selection == this.GetUpperChoiceBound() - 1)
+            {   
+                ModHandler.DeleteInstalledCautious();
+                Console.WriteLine(); // for console spacing
+                return this;
+            }
+
             // Go back a page
             if (selection == this.GetUpperChoiceBound())
                 return null;
             
             // Delete old mods
-            ThunderstoreHandler.DeleteInstalledMods();
+            ModHandler.DeleteInstalledCautious();
 
             // INSTALL MOD PACK SPECIFIED FROM YAML
             // Get modpack file name
@@ -63,7 +73,7 @@ namespace MikManager.MenuStuff
 
             // Download and install mods
             HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModsWithDependencies(configObj.Mods);
-            ThunderstoreHandler.InstallMods(modDownloadPaths);
+            ModHandler.InstallMods(modDownloadPaths);
             Console.WriteLine(); // For spacing
 
             return this;
@@ -76,8 +86,9 @@ namespace MikManager.MenuStuff
                 // This will give the user one option, which is to back out
                 return 1;
             // This will give the user one option per modpack, 
-            // and then one extra option to back out
-            return configList.Count + 1;
+            // one extra option to back out, and another 
+            // extra to delete their installed mods
+            return configList.Count + 2;
         }
 
         protected override int GetLowerChoiceBound()
