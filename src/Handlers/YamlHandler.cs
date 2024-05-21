@@ -11,10 +11,18 @@ namespace MikManager.Handlers
  
         public static Config ParseModConfigFile(string modConfigPath)
         {
-            Debug.LogInfo("Parsing config file...", loggerID);
-            using var reader = new StreamReader(modConfigPath);
-            var config = deserializer.Deserialize<Config>(reader);
-            return config;
+            try 
+            {
+                Debug.LogInfo("Parsing config file...", loggerID);
+                using var reader = new StreamReader(modConfigPath);
+                var config = deserializer.Deserialize<Config>(reader);
+                return config;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to parse config file: {ex.Message}", loggerID);
+                return new Config(){LethalCompanyVersion = "0", Mods = []};
+            }
         }
     }
 
