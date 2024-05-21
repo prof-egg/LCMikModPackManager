@@ -20,26 +20,22 @@ namespace MikManager.Handlers
 
             foreach (string modPath in extractedModPaths)
             {
-                string sourcePath = modPath;
                 string modName = modPath.Substring(modPath.LastIndexOf('/') + 1);
                 Debug.LogInfo($"Installing {modName}...", loggerID);
 
-                // Attempt to resolve BepInEx not being the first
-                // directory in the mod path
-                while (!Directory.Exists($"{sourcePath}/BepInEx"))
+                bool canInstall = DetermineSourceAndInstallPath(modPath, out string sourcePath, out string installPath);
+                if (!canInstall)
                 {
-                    string[] subPaths = Directory.GetDirectories(sourcePath);
-                    if (subPaths.Length == 0)
-                    {
-                        Debug.LogError($"Failed to install {modName}", loggerID);
-                        break;
-                    }
-                    sourcePath = subPaths[0];
+                    Debug.LogError($"Unable to install {modName}, manual intervention required.", loggerID);
+                    Debug.LogInfo($"Mod can be found at: {modPath}", loggerID);
+                    continue;
                 }
+                // Debug.LogInfo("Source: " + sourcePath, loggerID);
+                // Debug.LogInfo("Install: " + installPath, loggerID);
 
                 // Move content
-                MoveDirectoryContents(sourcePath, LC_PATH);
-
+                MoveDirectoryContents(sourcePath, installPath);
+            
                 // Delete whats left of original download
                 // Debug.LogInfo("Deleting leftover files...", loggerID);
                 Directory.Delete(modPath, true);
@@ -161,5 +157,44 @@ namespace MikManager.Handlers
                 // Directory.Delete(directory, true);
             }
         }      
+        private static bool DetermineSourceAndInstallPath(string extractedModPath, out string sourcePath, out string installPath)
+        {
+            if (Directory.Exists($"{extractedModPath}/BepInExPack"))
+            {
+                sourcePath = extractedModPath + "/BepInExPack";
+                installPath = LC_PATH;
+                return true;
+            } 
+            else if (Directory.Exists($"{extractedModPath}/BepInEx"))
+            {
+                sourcePath = extractedModPath;
+                installPath = LC_PATH;
+                return true;
+            }
+            else if (Directory.Exists($"{extractedModPath}/plugins"))
+            {
+                sourcePath = extractedModPath;
+                installPath = LC_PATH + "/BepInEx";
+                return true;
+            }
+            else if (Directory.Exists($"{extractedModPath}/LethalCompanyInputUtils"))
+            {
+                sourcePath = extractedModPath + "/LethalCompanyInputUtils";
+                installPath = LC_PATH + "/BepInEx/plugins";
+                return true;
+            }
+            // Check if dll file is just in the extracted folder bare bones
+            else if (Directory.GetFiles(extractedModPath).Any((filePath) => filePath.EndsWith(".dll")))
+            {
+                sourcePath = extractedModPath;
+                installPath = LC_PATH + "/BepInEx/plugins";
+                return true;
+            }
+            
+            // Couldn't figure out the layout, return false
+            installPath = "";
+            sourcePath = "";
+            return false;
+        }
     }
 }
