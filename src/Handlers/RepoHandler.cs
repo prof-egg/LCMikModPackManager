@@ -12,7 +12,12 @@ namespace MikManager.Handlers
         private const string RepoName = "LCMikModPackManager";
         private const string GitHubApiUrl = "https://api.github.com";
         private const string GitHubRateLimitApiUrl = "https://api.github.com/rate_limit";
-        public const string ModConfigPath = "mod-pack-data"; // Specify the folder path
+
+        public const string ModDataDirName = "mod-data";
+        public const string ClientModsDirName = "client-mods";
+        public const string GameVersionDirName = "game-version";
+        public const string ModPacksDirName = "mod-packs";
+        
         // This string gets prepended to the path returned by GetDownloadPath()
         private static readonly string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         private static readonly string PREPENEDED_DOWNLOAD_PATH = Path.Combine(userProfile, "Downloads") + "/";
@@ -22,7 +27,9 @@ namespace MikManager.Handlers
         private static string limitResetDate = "null";
         private static string limitResetTime = "null";
 
-        private static JArray? jsonConfigList = null;
+        private static string[]? modpackConfigList = null;
+        private static string[]? clientModsList = [];
+        private static string? gameVersion = null;
 
         public static void UpdateRateLimitDetails()
         {
@@ -74,32 +81,16 @@ namespace MikManager.Handlers
             }
         }
 
-        public static void UpdateModPackConfigList()
+        public static void UpdateModDataCache()
         {
-            Debug.LogInfo("Requesting mod pack configs...", loggerID);
+            Debug.LogInfo("Updating version cache...", loggerID);
+            UpdateVersionCache();
+            
+            Debug.LogInfo("Updating modpack config cache...", loggerID);
+            UpdateModpackOrClientModsCash(true);
 
-            string url = GetGitHubRepoAPIPath(ModConfigPath);
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("User-Agent", "HttpClient");
-
-            try
-            {
-                HttpResponseMessage response = httpClient.Send(request);
-                response.EnsureSuccessStatusCode();
-
-                string responseBody = response.Content.ReadAsStringAsync().Result;
-                JArray jsonArray = JArray.Parse(responseBody);
-
-                jsonConfigList = jsonArray;
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine($"Request exception: {e.Message}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Exception: {e.Message}");
-            }
+            Debug.LogInfo("Updating client mods cache...", loggerID);
+            UpdateModpackOrClientModsCash(false);
         }
 
         public static void DownloadFileFromRepo(string repoFilePath)
@@ -115,9 +106,14 @@ namespace MikManager.Handlers
             }
 
             Debug.LogInfo($"Downloading {fileName}...", loggerID);
-            DownloadFile(url, GetDownloadPath(fileName));
+            try   { DownloadFile(url, GetDownloadPath(fileName)); }
+            catch (Exception ex)
+            { Debug.LogError($"Unable to download from {url}: {ex.Message}", loggerID); }
         }
 
+        /***************************************************************************
+        * Getters
+        ***************************************************************************/
         public static int GetRateLimit()
         {
             return rateLimit;
@@ -138,14 +134,78 @@ namespace MikManager.Handlers
             return limitResetTime;
         }
 
-        public static JArray? GetModConfigList() 
+        public static string[]? GetModConfigList() 
         {
-            return jsonConfigList;
+            return modpackConfigList;
+        }
+
+        public static string[]? GetClientModsList() 
+        {
+            return clientModsList;
+        }
+
+        public static string? GetGameVersion()
+        {
+            return gameVersion;
         }
 
         /***************************************************************************
         * Helper Methods
         ***************************************************************************/
+        private static void UpdateVersionCache()
+        {
+            string url = GetGitHubAPIGameVersionURL();
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "HttpClient");
+            try
+            {
+                HttpResponseMessage response = httpClient.Send(request);
+                response.EnsureSuccessStatusCode();
+                string responseBody = response.Content.ReadAsStringAsync().Result;
+                JArray jsonArray = JArray.Parse(responseBody);
+                gameVersion = jsonArray.First().Value<string>("name");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to update version cache: {e.Message}", loggerID);
+            }
+        }
+
+        private static void UpdateModpackOrClientModsCash(bool updateModPackCache)
+        {
+            string cacheString = (updateModPackCache) ? "modpack" : "client mods";
+            if (gameVersion == null)
+            {
+                Debug.LogError($"Failed to update {cacheString} cache: gameVersion was null", loggerID);
+                return;
+            }
+
+            string url = (updateModPackCache) ? GetGitHubAPIModPacksURL(gameVersion) : GetGitHubAPIClientModsURL(gameVersion);
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "HttpClient");
+            try
+            {
+                HttpResponseMessage response = httpClient.Send(request);
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = response.Content.ReadAsStringAsync().Result;
+                JArray jsonArray = JArray.Parse(responseBody);
+
+                string[] cache = jsonArray
+                    .Where(token => token["name"] != null)
+                    // An item should never appear "null" because of the where statement above
+                    .Select(token => token.Value<string>("name") ?? "null") 
+                    .ToArray();
+                
+                if (updateModPackCache) modpackConfigList = cache;
+                else clientModsList = cache;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to update {cacheString} cache: {e.Message}", loggerID);
+            }
+        }
+
         private static void DownloadFile(string url, string outputPath)
         {
             using HttpResponseMessage response = httpClient.GetAsync(url).Result;
@@ -154,14 +214,31 @@ namespace MikManager.Handlers
             File.WriteAllBytes(outputPath, fileBytes);
         }
 
-        private static string GetGitHubRepoAPIPath(string relativePath)
+        /***************************************************************************
+        * Helper url/path methods
+        ***************************************************************************/
+        private static string GetGitHubAPIGameVersionURL()
+        {   
+            return GetGitHubAPIRepoURL($"{ModDataDirName}/{GameVersionDirName}");
+        }
+
+        private static string GetGitHubAPIClientModsURL(string lcVersion)
+        {   
+            return GetGitHubAPIRepoURL($"{ModDataDirName}/{ClientModsDirName}/{lcVersion}");
+        }
+
+        private static string GetGitHubAPIModPacksURL(string lcVersion)
+        {   
+            return GetGitHubAPIRepoURL($"{ModDataDirName}/{ModPacksDirName}/{lcVersion}");
+        }
+
+        private static string GetGitHubAPIRepoURL(string relativePath)
         {
             return $"{GitHubApiUrl}/repos/{RepoOwner}/{RepoName}/contents/{relativePath}";
         }
         
         private static string GetGitHubRepoDownloadPath(string relativePath)
         {
-            //https://raw.githubusercontent.com/{owner}/{repo}/main/{filePath}
             return $"https://raw.githubusercontent.com/{RepoOwner}/{RepoName}/main/{relativePath}";
         }
 
