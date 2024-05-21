@@ -12,7 +12,7 @@ namespace MikManager
             BaseMenu.InjectScanner(scanner);
             BaseMenu.PrintLabel();
 
-            RepoHandler.UpdateModPackConfigList();
+            RepoHandler.UpdateModDataCache();
             RepoHandler.UpdateRateLimitDetails();
             Console.WriteLine();
 
