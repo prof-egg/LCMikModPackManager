@@ -9,9 +9,9 @@ namespace MikManager.Handlers
         private const string loggerID = "ThunderstoreHandler";
         private static readonly HttpClient httpClient = new HttpClient();
 
-        // This string gets prepended to the path returned by GetDownloadPath()
-        private static readonly string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        private static readonly string PREPENEDED_DOWNLOAD_PATH = Path.Combine(userProfile, "Downloads") + "/";
+        // This string gets prepended to the path returned by GetModDownloadPath()
+        private static readonly string USER_PROFILE_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        private static string downloadPath = Path.Combine(USER_PROFILE_PATH, "Downloads") + "/";
 
         public static HashSet<string> DownloadModsWithDependencies(Config config)
         {
@@ -28,10 +28,10 @@ namespace MikManager.Handlers
 
         public static HashSet<string> DownloadModWithDependencies(string modDeveloper, string modId, string modVersion)
         {   
-            string downloadPath = GetDownloadPath(modId, modVersion);
-            string manifestJsonPath = downloadPath + "/manifest.json";
+            string modDownloadPath = GetModDownloadPath(modId, modVersion);
+            string manifestJsonPath = modDownloadPath + "/manifest.json";
 
-            HashSet<string> pathSet = [downloadPath];
+            HashSet<string> pathSet = [modDownloadPath];
 
             // Download, extract, and delete zip for mod
             bool succesfulDownload = DownloadMod(modDeveloper, modId, modVersion, true, true);
@@ -82,7 +82,7 @@ namespace MikManager.Handlers
             string dependencyString = $"{modDeveloper}-{modId}-{modVersion}";
             string downloadUrl = GetDownloadUrl(modDeveloper, modId, modVersion);
             string zipDownloadPath = GetZipDownloadPath(modId, modVersion);
-            string downloadPath = GetDownloadPath(modId, modVersion);
+            string modDownloadPath = GetModDownloadPath(modId, modVersion);
             string zipFileName = $"{modId}-{modVersion}.zip";
 
             try
@@ -99,12 +99,12 @@ namespace MikManager.Handlers
                 // Extract zip folder
                 if (extract)
                 {
-                    if (Directory.Exists(GetDownloadPath(modId, modVersion)))
+                    if (Directory.Exists(GetModDownloadPath(modId, modVersion)))
                         Debug.LogInfo($"{dependencyString} is already extracted, skipping...", loggerID);
                     else
                     {
                         Debug.LogInfo($"Extracting {zipFileName}...", loggerID);
-                        ZipFile.ExtractToDirectory(zipDownloadPath, downloadPath);
+                        ZipFile.ExtractToDirectory(zipDownloadPath, modDownloadPath);
                     }
                 }
 
@@ -121,6 +121,18 @@ namespace MikManager.Handlers
                 Debug.LogError($"Error downloading mod: {ex.Message}", loggerID);
                 return false;
             }
+        }
+
+        /***************************************************************************
+        * Getters and setters
+        ***************************************************************************/
+        public static string GetDownloadPath()
+        {
+            return downloadPath;
+        }
+        public static void SetDownloadPath(string newPath)
+        {
+            downloadPath = newPath;
         }
 
         /***************************************************************************
@@ -141,12 +153,12 @@ namespace MikManager.Handlers
 
         public static string GetZipDownloadPath(string modId, string modVersion) 
         {
-            return GetDownloadPath(modId, modVersion) + ".zip";
+            return GetModDownloadPath(modId, modVersion) + ".zip";
         }
 
-        public static string GetDownloadPath(string modId, string modVersion) 
+        public static string GetModDownloadPath(string modId, string modVersion) 
         {
-            return PREPENEDED_DOWNLOAD_PATH + $"{modId}-{modVersion}";
+            return GetDownloadPath() + $"{modId}-{modVersion}";
         }
     }
 }

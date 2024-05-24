@@ -7,14 +7,15 @@ namespace MikManager.Handlers
         private const string loggerID = "ModHandler";
     
         private static readonly string DEFAULT_LC_PATH = Path.Combine("C:", "Program Files (x86)", "Steam", "steamapps", "common", "Lethal Company");
-        private static readonly string LC_PATH = DEFAULT_LC_PATH;
+        private static string lcPath = DEFAULT_LC_PATH;
 
         public static bool InstallMods(IEnumerable<string> extractedModPaths)
         {
-            if (!Directory.Exists(LC_PATH))
+            if (!Directory.Exists(GetLCPath()))
             {
-                Debug.LogError($"Unable to find lethal company folder. Path checked: {LC_PATH}", loggerID);
-                Debug.LogInfo("Aborting...", loggerID);
+                Debug.LogError($"Unable to find lethal company folder. Path checked: {GetLCPath()}", loggerID);
+                Debug.LogInfo("Aborting install...", loggerID);
+                Debug.LogInfo($"Downloaded mods can be found in: {ThunderstoreHandler.GetDownloadPath()}", loggerID);
                 return false;
             }
 
@@ -50,11 +51,11 @@ namespace MikManager.Handlers
         {
             Debug.LogInfo("Deleting installed mods...", loggerID);
 
-            string bepInExPath = LC_PATH + "/BepInEx";
-            string dissonancePath = LC_PATH + "/Dissonance_Diagnostics";
+            string bepInExPath = GetLCPath() + "/BepInEx";
+            string dissonancePath = GetLCPath() + "/Dissonance_Diagnostics";
 
-            string doorStopPath = LC_PATH + "/doorstop_config.ini";
-            string winhttpPath = LC_PATH + "/winhttp.dll";
+            string doorStopPath = GetLCPath() + "/doorstop_config.ini";
+            string winhttpPath = GetLCPath() + "/winhttp.dll";
 
             // Delete BepInEx mod folder and supporting files
             if (Directory.Exists(bepInExPath))
@@ -78,7 +79,7 @@ namespace MikManager.Handlers
         public static void DeleteInstalledDangerous()
         {
             Debug.LogInfo("Deleting installed mods...", loggerID);
-            if (LC_PATH != DEFAULT_LC_PATH)
+            if (GetLCPath() != DEFAULT_LC_PATH)
             {
                 Debug.LogError("Attempted dangerous delete routine when LC_PATH != DEFAULT_LC_PATH", loggerID);
                 Debug.LogInfo("Aborting...", loggerID);
@@ -97,7 +98,7 @@ namespace MikManager.Handlers
             string unityPlayer = "UnityPlayer.dll";
             string[] relGameFiles = [icon, exe, nvngx, unityPlugin, crashHandler, unityPlayer];
 
-            string[] allDirectoryPaths = Directory.GetDirectories(LC_PATH);
+            string[] allDirectoryPaths = Directory.GetDirectories(GetLCPath());
             foreach (string path in allDirectoryPaths)
             {
                 if (!relGameDirectories.Contains(Path.GetFileName(path)))
@@ -105,13 +106,25 @@ namespace MikManager.Handlers
                     // Debug.LogInfo($"Would delete folder: {path} ({Path.GetFileName(path)})", loggerID);
             }
 
-            string[] allFilePaths = Directory.GetFiles(LC_PATH);
+            string[] allFilePaths = Directory.GetFiles(GetLCPath());
             foreach (string path in allFilePaths)
             {
                 if (!relGameFiles.Contains(Path.GetFileName(path)))
                     File.Delete(path);
                     // Debug.LogInfo($"Would delete file: {path}", loggerID);
             }
+        }
+
+        /***************************************************************************
+        * Getters and setters
+        ***************************************************************************/
+        public static string GetLCPath()
+        {
+            return lcPath;
+        }
+        public static void SetLCPath(string newPath)
+        {
+            lcPath = newPath;
         }
 
         /***************************************************************************
@@ -162,32 +175,32 @@ namespace MikManager.Handlers
             if (Directory.Exists($"{extractedModPath}/BepInExPack"))
             {
                 sourcePath = extractedModPath + "/BepInExPack";
-                installPath = LC_PATH;
+                installPath = GetLCPath();
                 return true;
             } 
             else if (Directory.Exists($"{extractedModPath}/BepInEx"))
             {
                 sourcePath = extractedModPath;
-                installPath = LC_PATH;
+                installPath = GetLCPath();
                 return true;
             }
             else if (Directory.Exists($"{extractedModPath}/plugins"))
             {
                 sourcePath = extractedModPath;
-                installPath = LC_PATH + "/BepInEx";
+                installPath = GetLCPath() + "/BepInEx";
                 return true;
             }
             else if (Directory.Exists($"{extractedModPath}/LethalCompanyInputUtils"))
             {
                 sourcePath = extractedModPath + "/LethalCompanyInputUtils";
-                installPath = LC_PATH + "/BepInEx/plugins";
+                installPath = GetLCPath() + "/BepInEx/plugins";
                 return true;
             }
             // Check if dll file is just in the extracted folder bare bones
             else if (Directory.GetFiles(extractedModPath).Any((filePath) => filePath.EndsWith(".dll")))
             {
                 sourcePath = extractedModPath;
-                installPath = LC_PATH + "/BepInEx/plugins";
+                installPath = GetLCPath() + "/BepInEx/plugins";
                 return true;
             }
             
