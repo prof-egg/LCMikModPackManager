@@ -1,4 +1,4 @@
-namespace MikManager.MenuStuff
+namespace MikManager.MenuStuff.Menus
 {
     public class HomeMenu : BaseMenu
     {

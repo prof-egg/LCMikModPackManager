@@ -2,7 +2,7 @@ using MikManager.Handlers;
 using MikManager.Util;
 using Newtonsoft.Json.Linq;
 
-namespace MikManager.MenuStuff
+namespace MikManager.MenuStuff.Menus
 {
     public class ClientModsListMenu : BaseMenu
     {

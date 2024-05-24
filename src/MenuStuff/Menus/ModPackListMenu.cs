@@ -1,7 +1,6 @@
 using MikManager.Handlers;
-using Newtonsoft.Json.Linq;
 
-namespace MikManager.MenuStuff
+namespace MikManager.MenuStuff.Menus
 {
     public class ModPackListMenu : BaseMenu
     {
@@ -9,6 +8,15 @@ namespace MikManager.MenuStuff
 
         public override void PrintMenu()
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("NOTE: ");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write("Installing a modpack DELETES any currently installed mods for consistency reasons. ");
+            Console.Write("This ensures there are no server-side mod inconsistencies when your group plays. ");
+            Console.WriteLine("If you wish to keep those mods, please save them somewhere else before continuing.");
+
+            Console.WriteLine(); // For spacing between options
+
             Console.WriteLine("MODPACK CONFIG MENU:");
 
             string[]? configList = RepoHandler.GetModConfigList();
@@ -17,10 +25,12 @@ namespace MikManager.MenuStuff
                 Console.WriteLine("Error: modpack config list was null");
             else 
             {
+                // List mod pack options
                 for (int i = 0; i < configList.Length; i++) 
                     Console.WriteLine($"({i + 1}) {configList[i]}");
             
                 Console.WriteLine(); // For spacing between options
+
                 Console.WriteLine($"({this.GetUpperChoiceBound() - 1}) Delete installed mods");
                 Console.WriteLine($"({this.GetUpperChoiceBound()}) Go back");
             }
@@ -29,7 +39,7 @@ namespace MikManager.MenuStuff
 
         protected override BaseMenu? HandleInput(int selection)
         {
-            // Delete installed mods
+            // Delete installed mods choice
             if (selection == this.GetUpperChoiceBound() - 1)
             {   
                 ModHandler.DeleteInstalledCautious();
@@ -37,7 +47,7 @@ namespace MikManager.MenuStuff
                 return this;
             }
 
-            // Go back a page
+            // Go back a page choice
             if (selection == this.GetUpperChoiceBound())
                 return null;
             

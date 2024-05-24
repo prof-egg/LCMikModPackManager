@@ -1,6 +1,6 @@
 using MikManager.Handlers;
 
-namespace MikManager.MenuStuff
+namespace MikManager.MenuStuff.Menus
 {
     public class RequestsMenu : BaseMenu
     {
