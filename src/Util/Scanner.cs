@@ -16,9 +16,9 @@ namespace MikManager.Util
             }
         }
 
-        public void NextLine()
+        public string? NextLine()
         {
-            _inputReader.ReadLine();
+            return _inputReader.ReadLine();
         }
     }
 }
