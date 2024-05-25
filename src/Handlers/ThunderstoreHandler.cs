@@ -11,7 +11,7 @@ namespace MikManager.Handlers
 
         // This string gets prepended to the path returned by GetModDownloadPath()
         private static readonly string USER_PROFILE_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        private static string downloadPath = Path.Combine(USER_PROFILE_PATH, "Downloads") + "/";
+        private static string downloadPath = Path.Combine(USER_PROFILE_PATH, "Downloads");
 
         public static HashSet<string> DownloadModsWithDependencies(Config config)
         {
@@ -23,7 +23,7 @@ namespace MikManager.Handlers
 
         public static HashSet<string> DownloadModWithDependencies(Mod mod)
         {   
-            return  DownloadModWithDependencies(mod.Developer, mod.Id, mod.Version);
+            return DownloadModWithDependencies(mod.Developer, mod.Id, mod.Version);
         }
 
         public static HashSet<string> DownloadModWithDependencies(string modDeveloper, string modId, string modVersion)
@@ -158,7 +158,7 @@ namespace MikManager.Handlers
 
         public static string GetModDownloadPath(string modId, string modVersion) 
         {
-            return GetDownloadPath() + $"{modId}-{modVersion}";
+            return GetDownloadPath() + $"/{modId}-{modVersion}";
         }
     }
 }
