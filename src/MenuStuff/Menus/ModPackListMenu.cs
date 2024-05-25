@@ -4,19 +4,10 @@ namespace MikManager.MenuStuff.Menus
 {
     public class ModPackListMenu : BaseMenu
     {
-        private const int LOWER_CHOICE_BOUND = 1;
+        private static readonly int LOWER_CHOICE_BOUND = 1;
 
         public override void PrintMenu()
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("NOTE: ");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write("Installing a modpack DELETES any currently installed mods for consistency reasons. ");
-            Console.Write("This ensures there are no server-side mod inconsistencies when your group plays. ");
-            Console.WriteLine("If you wish to keep those mods, please save them somewhere else before continuing.");
-
-            Console.WriteLine(); // For spacing between options
-
             Console.WriteLine("MODPACK CONFIG MENU:");
 
             string[]? configList = RepoHandler.GetModConfigList();
@@ -102,6 +93,14 @@ namespace MikManager.MenuStuff.Menus
         protected override int GetLowerChoiceBound()
         {
             return LOWER_CHOICE_BOUND;
+        }
+
+        protected override string? GetNote()
+        {
+            string s1 = "Installing a modpack DELETES any currently installed mods for consistency reasons. ";
+            string s2 = "This ensures there are no server-side mod inconsistencies when your group plays. ";
+            string s3 = "If you wish to keep those mods, please save them somewhere else before continuing.";
+            return s1 + s2 + s3;
         }
     }
 }

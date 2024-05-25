@@ -39,6 +39,23 @@ namespace MikManager.MenuStuff
             Console.WriteLine("                                                |___/               ");
         }
 
+
+        public void PrintNote()
+        {
+            string? note = GetNote();
+            if (note != null)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("NOTE: ");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine(note); 
+            }
+        }
+
+        public bool HasNote()
+        {
+            return this.GetNote() != null;
+        }
         /***************************************************************************
         * Helper Methods
         ***************************************************************************/
@@ -79,19 +96,23 @@ namespace MikManager.MenuStuff
         }
 
         /***************************************************************************
-        * Abstract Declarations
+        * Abstract Declarations/Overridables
         ***************************************************************************/
         public abstract void PrintMenu();
-        /**
-         * Returns an instance of {@code BaseMenu}. Return a new instance of a menu
-         * if you wish the {@code MenuHandler} to change pages, return {@code this} if 
-         * you wish to stay on the same page, and return {@code null} if you wish
-         * to go back a page.
-         * @param selection - The numerical input that the user gave
-         * @return an instance of {@code BaseMenu}
-         */
+        
+        /// Returns an instance of {@code BaseMenu}. Return a new instance of a menu
+        /// if you wish the {@code MenuHandler} to change pages, return {@code this} if 
+        /// you wish to stay on the same page, and return {@code null} if you wish
+        /// to go back a page.
+        /// @param selection - The numerical input that the user gave
+        /// @return an instance of {@code BaseMenu}
         protected abstract BaseMenu? HandleInput(int selection);
         protected abstract int GetUpperChoiceBound();
         protected abstract int GetLowerChoiceBound();
+
+        protected virtual string? GetNote()
+        {
+            return null;
+        }
     }
 }
