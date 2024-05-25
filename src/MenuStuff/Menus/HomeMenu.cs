@@ -10,7 +10,8 @@ namespace MikManager.MenuStuff.Menus
             Console.WriteLine("HOME MENU:");
             Console.WriteLine("(1) View modpack configs");
             Console.WriteLine("(2) View client mods list");
-            Console.WriteLine("(3) View request data");
+            Console.WriteLine("(3) Change paths");
+            Console.WriteLine("(4) View request data");
             Console.Write("\nWhat would you like to do? ");
         }
 
@@ -23,6 +24,8 @@ namespace MikManager.MenuStuff.Menus
                 case 2:
                     return new ClientModsListMenu();
                 case 3:
+                    return new PathMenu();
+                case 4:
                     return new RequestsMenu();
                 default:
                     Console.WriteLine(); // For spacing in the console
