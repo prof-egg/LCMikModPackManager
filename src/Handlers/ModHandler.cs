@@ -7,7 +7,7 @@ namespace MikManager.Handlers
         private const string loggerID = "ModHandler";
     
         private static readonly string DEFAULT_LC_PATH = Path.Combine("C:", "Program Files (x86)", "Steam", "steamapps", "common", "Lethal Company");
-        private static string lcPath = DEFAULT_LC_PATH;
+        private static string lcPath = SteamPathGuesser.GuessLCPath() ?? "null";
 
         public static bool InstallMods(IEnumerable<string> extractedModPaths)
         {
