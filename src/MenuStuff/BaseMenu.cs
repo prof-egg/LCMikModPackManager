@@ -4,6 +4,7 @@ namespace MikManager.MenuStuff
 {
     public abstract class BaseMenu
     {
+        private static readonly string CLIENT_VERSION = "2.2.0";
         protected static Scanner? scanner;
         protected Scanner input;
 
@@ -34,11 +35,10 @@ namespace MikManager.MenuStuff
             Console.WriteLine(" _ __ ___ ( ) | __  _ __ ___   __ _ _ __   __ _  __ _  ___ _ __     ");
             Console.WriteLine("| '_ ` _ \\| | |/ / | '_ ` _ \\ / _` | '_ \\ / _` |/ _` |/ _ \\ '__|");
             Console.WriteLine("| | | | | | |   <  | | | | | | (_| | | | | (_| | (_| |  __/ |       ");
-            Console.WriteLine("|_| |_| |_|_|_|\\_\\ |_| |_| |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_| ");
+            Console.WriteLine("|_| |_| |_|_|_|\\_\\ |_| |_| |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_| " + $"v{CLIENT_VERSION}");
             Console.WriteLine("                                                 __/ |              ");
             Console.WriteLine("                                                |___/               ");
         }
-
 
         public void PrintNote()
         {
