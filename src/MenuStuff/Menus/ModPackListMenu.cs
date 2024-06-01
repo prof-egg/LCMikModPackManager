@@ -1,13 +1,15 @@
 using MikManager.Handlers;
+using MikManager.Util;
 
 namespace MikManager.MenuStuff.Menus
 {
     public class ModPackListMenu : BaseMenu
     {
         private static readonly int LOWER_CHOICE_BOUND = 1;
+        private const string loggerID = "ModPackListMenu";
 
         public override void PrintMenu()
-        {
+        {                
             Console.WriteLine("MODPACK CONFIG MENU:");
 
             string[]? configList = RepoHandler.GetModConfigList();
@@ -25,6 +27,10 @@ namespace MikManager.MenuStuff.Menus
                 Console.WriteLine($"({this.GetUpperChoiceBound() - 1}) Delete installed mods");
                 Console.WriteLine($"({this.GetUpperChoiceBound()}) Go back");
             }
+
+            if (!Directory.Exists(ModHandler.GetLCPath()))
+                Debug.LogWarning($"Unable to locate lethal company. Path checked: {ModHandler.GetLCPath()}", loggerID, "\n");
+
             Console.Write("\nWhat pack would you like to install? ");
         }
 

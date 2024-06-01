@@ -26,6 +26,10 @@ namespace MikManager.MenuStuff.Menus
                 Console.WriteLine($"({this.GetUpperChoiceBound() - 1}) Delete installed mods");
                 Console.WriteLine($"({this.GetUpperChoiceBound()}) Go back");
             }
+
+            if (!Directory.Exists(ModHandler.GetLCPath()))
+                Debug.LogWarning($"Unable to locate lethal company. Path checked: {ModHandler.GetLCPath()}", loggerID, "\n");
+
             Console.Write("\nWhat mod would you like to install? ");
         }
 
