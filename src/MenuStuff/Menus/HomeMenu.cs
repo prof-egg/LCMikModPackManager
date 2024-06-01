@@ -3,7 +3,7 @@ namespace MikManager.MenuStuff.Menus
     public class HomeMenu : BaseMenu
     {
         private const int LOWER_CHOICE_BOUND = 1;
-        private const int UPPER_CHOICE_BOUND = 3;
+        private const int UPPER_CHOICE_BOUND = 4;
 
         public override void PrintMenu()
         {
