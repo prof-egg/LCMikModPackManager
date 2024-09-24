@@ -4,7 +4,7 @@ namespace MikManager.MenuStuff
 {
     public abstract class BaseMenu
     {
-        private static readonly string CLIENT_VERSION = "2.2.0";
+        private static readonly string CLIENT_VERSION = "2.2.1";
         protected static Scanner? scanner;
         protected Scanner input;
 
