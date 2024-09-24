@@ -196,6 +196,12 @@ namespace MikManager.Handlers
                 installPath = GetLCPath() + "/BepInEx/plugins";
                 return true;
             }
+            else if (Directory.Exists($"{extractedModPath}/config") || Directory.Exists($"{extractedModPath}/patchers"))
+            {
+                sourcePath = extractedModPath;
+                installPath = GetLCPath() + "/BepInEx";
+                return true;
+            }
             // Check if dll file is just in the extracted folder bare bones
             else if (Directory.GetFiles(extractedModPath).Any((filePath) => filePath.EndsWith(".dll")))
             {
