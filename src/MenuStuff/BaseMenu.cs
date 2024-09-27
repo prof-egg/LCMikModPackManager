@@ -4,14 +4,14 @@ namespace MikManager.MenuStuff
 {
     public abstract class BaseMenu
     {
-        private static readonly string CLIENT_VERSION = "2.2.1";
+        private static readonly string CLIENT_VERSION = "2.3.0";
         protected static Scanner? scanner;
         protected Scanner input;
 
         public BaseMenu()
         {
             if (scanner == null) 
-                throw new Exception("Tried to instantiate menu without first injecting scanner dependancy.");
+                throw new Exception("Tried to instantiate menu without first injecting scanner dependency.");
             this.input = scanner;
         }
 
