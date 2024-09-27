@@ -1,3 +1,4 @@
+using MikManager.CustomFileTypes;
 using MikManager.Handlers;
 using MikManager.Util;
 
@@ -76,6 +77,7 @@ namespace MikManager.MenuStuff.Menus
 
             // Download and install mods
             HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModsWithDependencies(configObj);
+            DependencyManager.Write();
             ModHandler.InstallMods(modDownloadPaths);
 
             RepoHandler.UpdateRateLimitDetails();

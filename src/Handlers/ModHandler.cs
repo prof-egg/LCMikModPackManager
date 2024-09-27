@@ -1,3 +1,4 @@
+using MikManager.CustomFileTypes;
 using MikManager.Util;
 
 namespace MikManager.Handlers
@@ -68,6 +69,8 @@ namespace MikManager.Handlers
             // Delete skin walker supporting folder
             if (Directory.Exists(dissonancePath))
                 Directory.Delete(dissonancePath, true);
+
+            DependencyManager.Clear();
         }
 
         /// <summary>
@@ -113,6 +116,8 @@ namespace MikManager.Handlers
                     File.Delete(path);
                     // Debug.LogInfo($"Would delete file: {path}", loggerID);
             }
+            
+            DependencyManager.Clear();
         }
 
         /***************************************************************************
@@ -137,23 +142,23 @@ namespace MikManager.Handlers
 
             // Move files
             foreach (string file in Directory.GetFiles(sourceDir))
-            {
-                string fileName = Path.GetFileName(file);
-                string destFile = Path.Combine(destinationDir, fileName);
-
-                // This is specifically for skipping unnecessary content that
-                // comes with the downloaded mod
-                bool skip = fileName == "manifest.json" || fileName == "CHANGELOG.md" || fileName == "README.md" || fileName == "icon.png";
-                if (skip) continue;
-                
+            {  
                 try 
                 {
+                    string fileName = Path.GetFileName(file);
+                    string destFile = Path.Combine(destinationDir, fileName);
+
+                    // This is specifically for skipping unnecessary content that
+                    // comes with the downloaded mod
+                    bool skip = fileName == "manifest.json" || fileName == "CHANGELOG.md" || fileName == "README.md" || fileName == "icon.png";
+                    if (skip) continue;
+
                     if (!File.Exists(destFile))
                         File.Move(file, destFile);
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"Error moving files and directories: {ex.Message}", loggerID);
+                    Debug.LogError($"Error moving files and directories: {ex}", loggerID);
                 }
             }
 

@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using MikManager.CustomFileTypes;
 using MikManager.Util;
 using Newtonsoft.Json.Linq;
 
@@ -10,8 +11,9 @@ namespace MikManager.Handlers
         private static readonly HttpClient httpClient = new HttpClient();
 
         // This string gets prepended to the path returned by GetModDownloadPath()
-        private static readonly string USER_PROFILE_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        private static string downloadPath = Path.Combine(USER_PROFILE_PATH, "Downloads");
+        // private static readonly string USER_PROFILE_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        // private static string downloadPath = Path.Combine(USER_PROFILE_PATH, "Downloads");
+        private static string downloadPath = MikPathGuardian.downloadsPath;
 
         public static HashSet<string> DownloadModsWithDependencies(Config config)
         {
@@ -36,7 +38,7 @@ namespace MikManager.Handlers
             // Download, extract, and delete zip for mod
             bool succesfulDownload = DownloadMod(modDeveloper, modId, modVersion, true, true);
             // Errors should be logged by the DownloadMod() method
-            if (!succesfulDownload) return pathSet;
+            if (!succesfulDownload) return new HashSet<string>();
                 
             try {
                 // Read manifest.json and get dependency string array
@@ -52,6 +54,12 @@ namespace MikManager.Handlers
                     if (dependencyString == null) 
                         continue;
                     Console.WriteLine($"{modId} dependency found: {dependencyString}");
+                    DependencyManager.AddReference(dependencyString);
+                    if (DependencyManager.GetReferences(dependencyString) > 1) 
+                    {
+                        Debug.LogInfo($"\"{dependencyString}\" already exists, skipping download...", loggerID);
+                        continue;
+                    }
 
                     // Extract mod details
                     // Example dependency string: BepInEx-BepInExPack-5.4.2100
@@ -68,22 +76,29 @@ namespace MikManager.Handlers
             } 
             catch (Exception ex) when (ex is DirectoryNotFoundException || ex is IOException || ex is FileNotFoundException)
             {
-                Debug.LogError($"Error reading manifest json: {ex.Message}", loggerID);
+                Debug.LogError($"Error reading manifest json: {ex}", loggerID);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error reading dependencies: {ex.Message}", loggerID);
+                Debug.LogError($"Error reading dependencies: {ex}", loggerID);
             }
             return pathSet;
         }
 
-        public static bool DownloadMod(string modDeveloper, string modId, string modVersion, bool extract = false, bool deleteZip = false)
+        // Marked private as to not mess up dependency manager
+        private static bool DownloadMod(string modDeveloper, string modId, string modVersion, bool extract = false, bool deleteZip = false)
         {
             string dependencyString = $"{modDeveloper}-{modId}-{modVersion}";
             string downloadUrl = GetDownloadUrl(modDeveloper, modId, modVersion);
             string zipDownloadPath = GetZipDownloadPath(modId, modVersion);
             string modDownloadPath = GetModDownloadPath(modId, modVersion);
             string zipFileName = $"{modId}-{modVersion}.zip";
+
+            if (!MikPathGuardian.EnsureMikManagerDirsQuiet())
+            {
+                Debug.LogError($"Unable to download \"{dependencyString}\": Lethal company folder does not exist", loggerID);
+                return false;
+            }
 
             try
             {
@@ -93,7 +108,8 @@ namespace MikManager.Handlers
                 else
                 {
                     Debug.LogInfo($"Downloading {zipFileName}...", loggerID);
-                    DownloadFile(downloadUrl, zipDownloadPath);
+                    bool successfulDownload = DownloadFile(downloadUrl, zipDownloadPath);
+                    if (!successfulDownload) return false;
                 }
 
                 // Extract zip folder
@@ -118,7 +134,7 @@ namespace MikManager.Handlers
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error downloading mod: {ex.Message}", loggerID);
+                Debug.LogError($"Error downloading mod: {ex}", loggerID);
                 return false;
             }
         }
@@ -138,13 +154,75 @@ namespace MikManager.Handlers
         /***************************************************************************
         * Helper Methods
         ***************************************************************************/
-        private static void DownloadFile(string url, string outputPath)
+        private static bool DownloadFile(string url, string outputPath)
         {
-            using HttpResponseMessage response = httpClient.GetAsync(url).Result;
-            response.EnsureSuccessStatusCode();
-            byte[] fileBytes = response.Content.ReadAsByteArrayAsync().Result;
-            File.WriteAllBytes(outputPath, fileBytes);
+            try {
+                using HttpResponseMessage response = httpClient.GetAsync(url).Result;
+                response.EnsureSuccessStatusCode();
+                byte[] fileBytes = response.Content.ReadAsByteArrayAsync().Result;
+                File.WriteAllBytes(outputPath, fileBytes); 
+                return true;
+            } catch (TaskCanceledException e) {
+                Debug.LogError($"Error downloading mod, this was likely due to the download taking too long: {e}", loggerID);
+            } catch (Exception e) {
+                Debug.LogError($"Error downloading mod: {e}", loggerID);
+            }
+            return false;
         }
+
+        // Async code by chat gpt
+        // private static async Task<bool> DownloadFileAsync(string url, string outputPath, IProgress<double> progress = null)
+        // {
+        //     try
+        //     {
+        //         using HttpResponseMessage response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, url), HttpCompletionOption.ResponseHeadersRead);
+        //         response.EnsureSuccessStatusCode();
+
+        //         using Stream contentStream = await response.Content.ReadAsStreamAsync();
+        //         using FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
+
+        //         byte[] buffer = new byte[8192];
+        //         long totalBytes = response.Content.Headers.ContentLength ?? -1;
+        //         long totalRead = 0;
+        //         int readBytes;
+
+        //         var stopwatch = new System.Diagnostics.Stopwatch();
+        //         stopwatch.Start();
+
+        //         while ((readBytes = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        //         {
+        //             await fileStream.WriteAsync(buffer, 0, readBytes);
+        //             totalRead += readBytes;
+
+        //             // Report progress
+        //             if (totalBytes > 0 && progress != null)
+        //             {
+        //                 double percentComplete = (double)totalRead / totalBytes * 100;
+        //                 progress.Report(percentComplete);
+        //             }
+
+        //             // If download is taking longer than 5 seconds, start sending progress updates
+        //             if (stopwatch.Elapsed.TotalSeconds > 5 && progress != null)
+        //             {
+        //                 double percentComplete = totalBytes > 0 ? (double)totalRead / totalBytes * 100 : -1;
+        //                 progress.Report(percentComplete);
+        //             }
+        //         }
+
+        //         stopwatch.Stop();
+        //         return true;
+        //     }
+        //     catch (TaskCanceledException e)
+        //     {
+        //         Debug.LogError($"Error downloading mod, this was likely due to the download taking too long: {e}", loggerID);
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Debug.LogError($"Error downloading mod: {e}", loggerID);
+        //     }
+        //     return false;
+        // }
+
 
         public static string GetDownloadUrl(string modDeveloper, string modId, string modVersion)
         {

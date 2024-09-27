@@ -1,3 +1,4 @@
+using MikManager.CustomFileTypes;
 using MikManager.Handlers;
 using MikManager.Util;
 using Newtonsoft.Json.Linq;
@@ -65,6 +66,7 @@ namespace MikManager.MenuStuff.Menus
             // Download and install mod based on selected file name
             Mod mod = new Mod(clientModFileName);
             HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModWithDependencies(mod);
+            DependencyManager.Write();
             ModHandler.InstallMods(modDownloadPaths);
 
             RepoHandler.UpdateRateLimitDetails();
