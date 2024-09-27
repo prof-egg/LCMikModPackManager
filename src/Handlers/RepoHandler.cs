@@ -19,8 +19,9 @@ namespace MikManager.Handlers
         public const string ModPacksDirName = "mod-packs";
         
         // This string gets prepended to the path returned by GetDownloadPath()
-        private static readonly string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        private static readonly string PREPENEDED_DOWNLOAD_PATH = Path.Combine(userProfile, "Downloads") + "/";
+        // private static readonly string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        // private static readonly string PREPENEDED_DOWNLOAD_PATH = Path.Combine(userProfile, "Downloads") + "/";
+        private static string PREPENEDED_DOWNLOAD_PATH = MikPathGuardian.downloadsPath + "/";
 
         private static int rateLimit = -1;
         private static int requestsRemaining = -1;
@@ -73,11 +74,11 @@ namespace MikManager.Handlers
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Request exception: {e.Message}");
+                Console.WriteLine($"Request exception: {e}");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception: {e.Message}");
+                Console.WriteLine($"Exception: {e}");
             }
         }
 
@@ -108,7 +109,7 @@ namespace MikManager.Handlers
             Debug.LogInfo($"Downloading {fileName}...", loggerID);
             try   { DownloadFile(url, GetDownloadPath(fileName)); }
             catch (Exception ex)
-            { Debug.LogError($"Unable to download from {url}: {ex.Message}", loggerID); }
+            { Debug.LogError($"Unable to download from {url}: {ex}", loggerID); }
         }
 
         /***************************************************************************
@@ -167,7 +168,7 @@ namespace MikManager.Handlers
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to update version cache: {e.Message}", loggerID);
+                Debug.LogError($"Failed to update version cache: {e}", loggerID);
             }
         }
 
@@ -202,7 +203,7 @@ namespace MikManager.Handlers
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to update {cacheString} cache: {e.Message}", loggerID);
+                Debug.LogError($"Failed to update {cacheString} cache: {e}", loggerID);
             }
         }
 
