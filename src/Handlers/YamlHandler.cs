@@ -20,7 +20,7 @@ namespace MikManager.Handlers
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to parse config file: {ex.Message}", loggerID);
+                Debug.LogError($"Failed to parse config file: {ex}", loggerID);
                 return new Config(){LethalCompanyVersion = "0", Mods = []};
             }
         }
