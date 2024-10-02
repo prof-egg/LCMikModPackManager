@@ -9,7 +9,7 @@ Stuff
 - Paths now show up with all "\" instead of a mixture of "/" and "\"
 
 ## 2.2.1
-- Undocumented
+- Client now handles mods with a "patchers" or "config" folder in the root.
 
 ## 2.2.0
 - Undocumented
