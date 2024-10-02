@@ -17,7 +17,7 @@ namespace MikManager.Util
             if (string.IsNullOrEmpty(gameInstallPath))
                 return null;
 
-            return gameInstallPath;
+            return gameInstallPath.Replace("/", "\\");
         }
 
         public static string? GetSteamPath()
