@@ -6,7 +6,7 @@ Stuff
 - Added change log
 - Improved download speed by introducing a dependency manager that prevents the client from downloading a single dependency multiple times
 - Default wait time for download is now 5 minutes, if a download takes more than 5 minutes the client will throw an exception
-- Paths now show up with all "\" instead of a mixture of "/" and "\"
+- Paths now show up with all "\\" instead of a mixture of "/" and "\\"
 - Added Mik directories to lethal company install to handle downloads, future .modd files, and the .dependencies file
 - Downloads no longer use the windows downloads folder, they instead use the Lethal Company/MikModManager/downloads folder
 
