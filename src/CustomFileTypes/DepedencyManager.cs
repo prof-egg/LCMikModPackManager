@@ -10,7 +10,6 @@ namespace MikManager.CustomFileTypes
         private static readonly string dirPath = $"{ModHandler.GetLCPath()}/{MikPathGuardian.parentDir}";
         private static readonly string filePath = $"{dirPath}/{fileName}";
         private static readonly string loggerID = "DependencyManager";
-        private static bool initiated = false;
         private static Dictionary<string, byte> depRefs = new Dictionary<string, byte>();
 
         // public static void AddReference(IEnumerable<string> depStrings) 
@@ -98,12 +97,6 @@ namespace MikManager.CustomFileTypes
             depRefs = DeserializeData(buffer);
         }
 
-
-
-        public static bool IsInitiated => initiated;
-
-
-
         private static byte[] SerializeData(Dictionary<string, byte> dict) => Encoding.UTF8.GetBytes(ToStringCore(dict));
 
         private static Dictionary<string, byte> DeserializeData(byte[] buffer)
@@ -126,8 +119,6 @@ namespace MikManager.CustomFileTypes
             }
             return dict;
         }
-
-
 
         public new static string ToString() => ToStringCore(depRefs);
 
