@@ -45,7 +45,7 @@ namespace MikManager.CustomFileTypes
             RemoveReferenceCore(depString, 1, depRefs);
         }
 
-        public static void RemoveReferenceCore(string depString, byte references, Dictionary<string, byte> dict) 
+        private static void RemoveReferenceCore(string depString, byte references, Dictionary<string, byte> dict) 
         {
             if (!dict.ContainsKey(depString)) 
             {
