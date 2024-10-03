@@ -15,10 +15,10 @@ namespace MikManager.Handlers
         // private static string downloadPath = Path.Combine(USER_PROFILE_PATH, "Downloads");
         private static string downloadPath = MikPathGuardian.downloadsPath;
 
-        static ThunderstoreHandler()
-        {
-            httpClient.Timeout = TimeSpan.FromMinutes(5); // or Timeout.InfiniteTimeSpan to disabled
-        }
+        // static ThunderstoreHandler()
+        // {
+        //     httpClient.Timeout = TimeSpan.FromMinutes(5); // or Timeout.InfiniteTimeSpan to disabled
+        // }
 
         public static HashSet<string> DownloadModsWithDependencies(Config config)
         {
