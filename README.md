@@ -2,6 +2,9 @@ Stuff
 
 # Changelog
 
+## 2.3.1
+- Removed bug setting default to 5 minutes (idk why this broke the client it was working fine in the vscode terminal)
+
 ## 2.3.0
 - Added change log
 - Improved download speed by introducing a dependency manager that prevents the client from downloading a single dependency multiple times
