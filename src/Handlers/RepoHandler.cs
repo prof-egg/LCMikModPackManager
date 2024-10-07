@@ -74,11 +74,11 @@ namespace MikManager.Handlers
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Request exception: {e}");
+                Debug.LogError($"Request exception: {e}", loggerID);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception: {e}");
+                Debug.LogError($"Exception: {e}", loggerID);
             }
         }
 
