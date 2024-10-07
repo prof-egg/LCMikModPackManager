@@ -11,8 +11,9 @@ namespace MikManager.MenuStuff.Menus
 
         public override void PrintMenu()
         {
+            string s = DependencyManager.ToString().Replace(":", ": ") + '\n';
             Console.WriteLine("DEPENDENCY REFERENCES:");
-            Console.WriteLine(DependencyManager.ToString().Replace(":", ": ") + '\n');
+            Console.WriteLine(s.Length > 1 ? s : "no mods installed\n");
             Console.Write("Type 1 to go back: ");
         }
 
