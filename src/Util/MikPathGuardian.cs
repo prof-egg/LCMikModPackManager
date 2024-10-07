@@ -8,9 +8,10 @@ namespace MikManager.Util
         public static readonly string parentDir = "MikModManager";
         public static readonly string modsDirName = "mods";
         public static readonly string downloadsDirName = "downloads";
-        public static readonly string downloadsPath = $"{ModHandler.GetLCPath()}/{parentDir}/{downloadsDirName}";
+        public static readonly string downloadsPath = $"{ModHandler.GetLCPath()}\\{parentDir}\\{downloadsDirName}";
+        public static readonly string modFilesPath = $"{ModHandler.GetLCPath()}\\{parentDir}\\{modsDirName}";
 
-        private static readonly string[] directories = [parentDir, $"{parentDir}/{modsDirName}", $"{parentDir}/{downloadsDirName}"];
+        private static readonly string[] directories = [parentDir, $"{parentDir}\\{modsDirName}", $"{parentDir}\\{downloadsDirName}"];
         private static readonly string loggerID = "MikPathGuardian";
 
         /// <summary>
