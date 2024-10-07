@@ -35,7 +35,7 @@ namespace MikManager.Handlers
 
         public static HashSet<string> DownloadModWithDependencies(string modDeveloper, string modId, string modVersion)
         {   
-            string modDownloadPath = GetModDownloadPath(modId, modVersion);
+            string modDownloadPath = GetModDownloadPath(modDeveloper, modId, modVersion);
             string manifestJsonPath = modDownloadPath + "/manifest.json";
 
             HashSet<string> pathSet = [modDownloadPath];
@@ -59,8 +59,7 @@ namespace MikManager.Handlers
                     if (dependencyString == null) 
                         continue;
                     Console.WriteLine($"{modId} dependency found: {dependencyString}");
-                    DependencyManager.AddReference(dependencyString);
-                    if (DependencyManager.GetReferences(dependencyString) > 1) 
+                    if (DependencyManager.GetReferences(dependencyString) > 0) 
                     {
                         Debug.LogInfo($"\"{dependencyString}\" already exists, skipping download...", loggerID);
                         continue;
@@ -94,10 +93,15 @@ namespace MikManager.Handlers
         private static bool DownloadMod(string modDeveloper, string modId, string modVersion, bool extract = false, bool deleteZip = false)
         {
             string dependencyString = $"{modDeveloper}-{modId}-{modVersion}";
+            if (LCMDWarehouse.ModDescriptions.Any((d) => d.DependencyString == dependencyString))
+            {
+                Debug.LogInfo($"{dependencyString} is already installed, skipping...", loggerID);
+                return false;
+            }
             string downloadUrl = GetDownloadUrl(modDeveloper, modId, modVersion);
-            string zipDownloadPath = GetZipDownloadPath(modId, modVersion);
-            string modDownloadPath = GetModDownloadPath(modId, modVersion);
-            string zipFileName = $"{modId}-{modVersion}.zip";
+            string zipDownloadPath = GetZipDownloadPath(modDeveloper, modId, modVersion);
+            string modDownloadPath = GetModDownloadPath(modDeveloper, modId, modVersion);
+            string zipFileName = $"{dependencyString}.zip";
 
             if (!MikPathGuardian.EnsureMikManagerDirsQuiet())
             {
@@ -108,7 +112,7 @@ namespace MikManager.Handlers
             try
             {
                 // Download zip folder
-                if (File.Exists(GetZipDownloadPath(modId, modVersion)))
+                if (File.Exists(GetZipDownloadPath(modDeveloper, modId, modVersion)))
                     Debug.LogInfo($"{dependencyString} is already download, skipping...", loggerID);
                 else
                 {
@@ -120,7 +124,7 @@ namespace MikManager.Handlers
                 // Extract zip folder
                 if (extract)
                 {
-                    if (Directory.Exists(GetModDownloadPath(modId, modVersion)))
+                    if (Directory.Exists(GetModDownloadPath(modDeveloper, modId, modVersion)))
                         Debug.LogInfo($"{dependencyString} is already extracted, skipping...", loggerID);
                     else
                     {
@@ -234,14 +238,14 @@ namespace MikManager.Handlers
             return $"https://thunderstore.io/package/download/{modDeveloper}/{modId}/{modVersion}";
         }
 
-        public static string GetZipDownloadPath(string modId, string modVersion) 
+        public static string GetZipDownloadPath(string modDeveloper, string modId, string modVersion) 
         {
-            return GetModDownloadPath(modId, modVersion) + ".zip";
+            return GetModDownloadPath(modDeveloper, modId, modVersion) + ".zip";
         }
 
-        public static string GetModDownloadPath(string modId, string modVersion) 
+        public static string GetModDownloadPath(string modDeveloper, string modId, string modVersion) 
         {
-            return GetDownloadPath() + $"/{modId}-{modVersion}";
+            return GetDownloadPath() + $"/{modDeveloper}-{modId}-{modVersion}";
         }
     }
 }
