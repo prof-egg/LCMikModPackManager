@@ -10,7 +10,7 @@ Stuff
   - Manages a .lcmd save file
 - Added a new menu to let you see what mods you have installed
 - Added a new menu to let you see what mods are dependencies and how many references each mod has
-Note: With this and this new system from 2.3.0, more dynamic utility will be available to be made.
+Note: With this and the new system from 2.3.0, more dynamic utility can be created
 
 ## 2.3.1
 - Removed bug setting default to 5 minutes (idk why this broke the client it was working fine in the vscode terminal)
