@@ -7,8 +7,8 @@ namespace MikManager.CustomFileTypes
     public static class DependencyManager
     {
         private static readonly string fileName = ".dependencies";
-        private static readonly string dirPath = $"{ModHandler.GetLCPath()}/{MikPathGuardian.parentDir}";
-        private static readonly string filePath = $"{dirPath}/{fileName}";
+        private static readonly string dirPath = $"{ModHandler.GetLCPath()}\\{MikPathGuardian.parentDir}";
+        private static readonly string filePath = $"{dirPath}\\{fileName}";
         private static readonly string loggerID = "DependencyManager";
         private static Dictionary<string, byte> depRefs = new Dictionary<string, byte>();
 
@@ -23,6 +23,7 @@ namespace MikManager.CustomFileTypes
         {
             Debug.LogInfo($"Adding \"{depString}\" reference...", loggerID);
             AddReferenceCore(depString, 1, depRefs);
+            Write();
         }
 
         private static void AddReferenceCore(string depString, byte references, Dictionary<string, byte> dict) 
@@ -43,6 +44,7 @@ namespace MikManager.CustomFileTypes
         {
             Debug.LogInfo($"Removing \"{depString}\" reference...", loggerID);
             RemoveReferenceCore(depString, 1, depRefs);
+            Write();
         }
 
         private static void RemoveReferenceCore(string depString, byte references, Dictionary<string, byte> dict) 
@@ -58,7 +60,7 @@ namespace MikManager.CustomFileTypes
 
 
         
-        public static byte GetReferences(string depString) => depRefs[depString];
+        public static byte GetReferences(string depString) => depRefs.TryGetValue(depString, out byte value) ? value : (byte)0;
 
         public static void Clear() 
         {
@@ -103,6 +105,7 @@ namespace MikManager.CustomFileTypes
         {
             Dictionary<string, byte> dict = new Dictionary<string, byte>();
             string dataString = Encoding.UTF8.GetString(buffer);
+            if (dataString.Length < 2) return dict;
             // One entry looks something like "bizzlemip-BiggerLobby-2.7.0:5"
             string[] entries = dataString.Split('\n');
             foreach (string entry in entries)
