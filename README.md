@@ -2,6 +2,16 @@ Stuff
 
 # Changelog
 
+## 2.4.0
+- Changed the fundamental way the mod manager works, moving/deleting files are now managed by a new system that:
+  - Keeps track of individual files that belong to each mod
+  - Keeps track of other information like mod name, version, develeoper etc.
+  - Manages its own set of dll files
+  - Manages a .lcmd save file
+- Added a new menu to let you see what mods you have installed
+- Added a new menu to let you see what mods are dependencies and how many references each mod has
+Note: With this and this new system from 2.3.0, more dynamic utility will be available to be made.
+
 ## 2.3.1
 - Removed bug setting default to 5 minutes (idk why this broke the client it was working fine in the vscode terminal)
 
