@@ -40,7 +40,7 @@ namespace MikManager.MenuStuff.Menus
             // Delete installed mods choice
             if (selection == this.GetUpperChoiceBound() - 1)
             {   
-                ModHandler.DeleteInstalledCautious();
+                LCMDWarehouse.DeleteAll();
                 Console.WriteLine(); // for console spacing
                 return this;
             }
@@ -49,8 +49,8 @@ namespace MikManager.MenuStuff.Menus
             if (selection == this.GetUpperChoiceBound())
                 return null;
             
-            // Delete old mods
-            ModHandler.DeleteInstalledCautious();
+            // ModHandler.DeleteInstalledCautious();
+            LCMDWarehouse.DeleteAll();
 
             // INSTALL MOD PACK SPECIFIED FROM YAML
             // Get modpack file name
@@ -77,10 +77,13 @@ namespace MikManager.MenuStuff.Menus
 
             // Download and install mods
             HashSet<string> modDownloadPaths = ThunderstoreHandler.DownloadModsWithDependencies(configObj);
-            DependencyManager.Write();
-            ModHandler.InstallMods(modDownloadPaths);
+            // DependencyManager.Write();
+            // ModHandler.InstallMods(modDownloadPaths);
+            foreach (string path in modDownloadPaths)
+                new MikModDescription(path, false).Install();
 
             RepoHandler.UpdateRateLimitDetails();
+            LCMDWarehouse.UpdateWarehouse();
             Console.WriteLine(); // For spacing
 
             return this;
