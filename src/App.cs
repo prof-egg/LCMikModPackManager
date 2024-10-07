@@ -3,6 +3,7 @@ using MikManager.MenuStuff;
 using MikManager.MenuStuff.Menus;
 using MikManager.Handlers;
 using MikManager.CustomFileTypes;
+using MikManager.Scripts;
 
 namespace MikManager
 {
@@ -10,7 +11,6 @@ namespace MikManager
     {
         public static void Main(string[] args)
         {
-            // NOTE: TODO: If the user types "sex" show the admin menus as well, this would be rate limits, dependency viewing, and other stuff
             Scanner scanner = new Scanner(Console.In);
             BaseMenu.InjectScanner(scanner);
             BaseMenu.PrintLabel();
@@ -19,16 +19,18 @@ namespace MikManager
             RepoHandler.UpdateRateLimitDetails();
             MikPathGuardian.EnsureMikManagerDirs();
             DependencyManager.Read();
+            LCMDWarehouse.UpdateWarehouse();
             Console.WriteLine();
 
             MenuHandler.Initialize(new HomeMenu());
 
-            // DependencyManager.AddReference("test");
-            // DependencyManager.AddReference("test2");
-            // DependencyManager.GetReferences("test");
-            // DependencyManager.Write();
-            // DependencyManager.Read();
-            // Console.WriteLine(DependencyManager.GetReferences("test"));
+            // ClientMods.CheckUpdates("v64");
+            // MikModDescription modd = new MikModDescription("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Lethal Company\\MikModManager\\mods\\vasanex-ItemQuickSwitch-1.1.0.lcmd");
+            // MikModDescription modd = new MikModDescription("C:\\Users\\BMike\\Downloads\\vasanex-ItemQuickSwitch-1.1.0", false);
+            // modd.Write();
+            // modd.Install();
+            // modd.Delete();
+            // Console.WriteLine(modd);
         }
     }
 }
